@@ -1,11 +1,10 @@
-import mysql from "mysql"
-import { property } from "../models/propertyModels";
-import { generateToken } from "../utils/utils";
+import { property } from "../models/propertyModels.js";
+import { generateToken } from "../utils/utils.js";
 
 export const newProperty = async(req,res)=>{
     try{
         const {propertyType, propertyName, description, image, country, state, city, zipCode, address} = req.body;
-        const createProperty = await property.create({
+        const createProperty = await new property({
             propertyType,
             propertyName,
             description,
@@ -15,30 +14,35 @@ export const newProperty = async(req,res)=>{
             city,
             zipCode,
             address,
-        });
-        if(createProperty){
-            res.join({
-                _id: createProperty._id,
-                propertyType: createProperty.propertyType,
-                propertyName: createProperty.propertyName,
-                description: createProperty.description,
-                image: createProperty.image,
-                country: createProperty.country,
-                state: createProperty.state,
-                city: createProperty.city,
-                zipCode: createProperty.zipCode,
-                address: createProperty.address,
-                token: generateToken(createProperty._id)
-            })
-        }
-
-        await createProperty.save();
-        res.json({
-            message: "New property created succesfully!",
-            data: createRecipe
         })
+        await createProperty.save()
+        .then(()=>res.status(201).json(
+            {
+                message: "New property created succesfully!",
+                data: createProperty
+            }
+        ))
+        // if(createProperty){
+        //     res.join({
+        //         _id: createProperty._id,
+        //         propertyType: createProperty.propertyType,
+        //         propertyName: createProperty.propertyName,
+        //         description: createProperty.description,
+        //         image: createProperty.image,
+        //         country: createProperty.country,
+        //         state: createProperty.state,
+        //         city: createProperty.city,
+        //         zipCode: createProperty.zipCode,
+        //         address: createProperty.address,
+        //         token: generateToken(createProperty._id)
+        //     })
+        // }
+
+        
+        
     } catch(error){
         console.error(error.message);
+        res.status(500).json(error)
     }
 }
 
@@ -46,12 +50,13 @@ export const newProperty = async(req,res)=>{
 
 export const getAllProperty = async(req,res)=>{
     try{
-        const rec = await recipe.find()
+        const rec = await property.find()
+        console.log(rec)
 
         if(rec){
-            res.send(rec)
+            res.status(200).json(rec)
         }else{
-            res.send("No porperty found")
+            res.status(404).json({message:"Property not found"})
         }
     } catch(error){
         console.error(error.message)
@@ -62,27 +67,20 @@ export const getAllProperty = async(req,res)=>{
 
 export const getProperty = async(req,res)=>{
     try{
-        if(!mysql.Types.ObjectId.isValid(req.params.id)){
-            return res.json({message: "Property not found"});
-        }
         const id = req.params.id;
         const rec = await property.findById(id);
         if(rec){
-            res.send(rec)
+            res.status(200).json(rec)
         }
     } catch(error){
         console.error(error.message);
+        res.status(500).json(error.message)
     }
 }
 
 //update property
 export const updateProperty = async(req,res)=>{
     try{
-        if(!mysql.Types.ObjectId.isvalid(req.params.id)){
-            return res.json({
-                message: "Property not found"
-            });
-        }
         const id = req.params.id;
         const rec = await property.findByIdAndUpdate(id.req.body,{
             new: true,
@@ -103,11 +101,6 @@ export const updateProperty = async(req,res)=>{
 //delete property
 export const deleteProperty = async(req,res)=>{
     try{
-        if(!mysql.Types.ObjectId.isValid(req.params.id)){
-            return res.json({
-               message: "Property not found" 
-            });
-        }
         const id = req.paras.id;
         const rec = await property.findByIdAndDelete(id)
         if(rec){

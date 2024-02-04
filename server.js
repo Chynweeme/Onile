@@ -1,15 +1,20 @@
 import express from "express"
-import mysql from "mysql"
 import dotenv from "dotenv"
 import createProperty from "./routes/propertyRoute.js"
 import createUser from './routes/userRoute.js'
+import cors from "cors"
+import { connectDB } from "./config/db.js"
+
 
 dotenv.config();
+connectDB();
 
 
 
 //making express an app
 const app = express();
+
+app.use(express.json())
 
 app.use(cors({
     origin: "*"
@@ -17,12 +22,14 @@ app.use(cors({
 
 const port = process.env.PORT || 3000
 
+
+app.use('/property', createProperty)
+app.use('/user', createUser)
+
+
 app.get('/',(req,res)=>{
     res.send('Welcome to Onile website!!')
 })
-
-app.use('/property', createProperty)
-app.use('/', createUser)
 
 app.listen(port,()=>{
     console.log(`This project is running at ${port}`)

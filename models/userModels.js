@@ -1,9 +1,9 @@
-const mysql = require ("mysql");
-const validator = require ("validator");
-const bcrypt = require ("bcrypt");
+import validator from "validator";
+import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 
 //creating the schema
-const userSchema = new mysql.Schema(
+const userSchema = new mongoose.Schema(
     {
         name:{
             type: String,
@@ -39,11 +39,11 @@ userSchema.statics.signup = async function(email, password){
         throw Error("Incorrect signup details")
     }
 
-    if(!validator.isEmail(email)){
+    if(!isEmail(email)){
         throw Error("Incorrect email")
     }
 
-    if(!validator.isStrongPassword(password)){
+    if(!isStrongPassword(password)){
         throw Error("Incorrect password")
     }
 
@@ -53,8 +53,8 @@ userSchema.statics.signup = async function(email, password){
     }
     
     //encrypt password
-    const passwordEncrypt = await bcrypt.genSalt(8); //this one shows the number of stars in password format
-    const hash = await bcrypt.hash(password, passwordEncrypt); //whenever you type, it will convert the letters to hash
+    const passwordEncrypt = await genSalt(8); //this one shows the number of stars in password format
+    const hash = await _hash(password, passwordEncrypt); //whenever you type, it will convert the letters to hash
 
     //creating the user
     const user = await this.create({email, password: hash});
@@ -63,5 +63,4 @@ userSchema.statics.signup = async function(email, password){
 
 
 
-
-module.exports = mysql.model("user", userSchema)
+export const user = mongoose.model("user", userSchema)

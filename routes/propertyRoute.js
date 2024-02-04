@@ -1,12 +1,12 @@
 import express from "express";
-import { getProperty, getAllProperty, updateProperty, deleteProperty,newProperty } from "../controller/propertyController";
+import { getProperty, getAllProperty, updateProperty, deleteProperty,newProperty } from "../controller/propertyController.js";
 
 
 const router = express.Router();
 
 router.get('/', getAllProperty)
 router.post('/', newProperty)
-router.post('/:id', getProperty)
+router.get('/:id', getProperty)
 router.put('/update/:id', updateProperty)
 router.delete('/delete/:id', deleteProperty)
 

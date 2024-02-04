@@ -1,6 +1,6 @@
-import mysql from "mysql"
+import mongoose from "mongoose"
 
-const propertySchema = new mysql.Schema(
+const propertySchema = new mongoose.Schema(
     {
         propertyType:{
             type: String,
@@ -17,8 +17,8 @@ const propertySchema = new mysql.Schema(
             required: true,
         },
         image:{
-            type: Image,
-            required: true,
+            type: String,
+            required: false,
         },
         country:{
             type: String,
@@ -46,4 +46,4 @@ const propertySchema = new mysql.Schema(
     }
 )
 
-export const property = mysql.model("property", propertySchema)
+export const property = mongoose.model("property", propertySchema)

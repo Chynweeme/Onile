@@ -1,14 +1,13 @@
-import mysql from "mysql";
 import {user} from "../models/userModels.js";
 import { generateToken } from "../utils/utils.js";
 
 
 export const signup = async(req, res)=>{
     const {name,email,password,role} = req.body;
-    const userExists = await user.findOne({email});
+    const userExists = await user.findOne({email,password});
 
     if (userExists){
-        throw new Error("Email already exits. Please signup with a different email")
+        res.status(400).json({message:"Email already exits. Please signup with a different email"})
     }
 
     const newUser = await user.create({
@@ -23,6 +22,7 @@ export const signup = async(req, res)=>{
             _id: newUser._id,
             name: newUser.name,
             email: newUser.email,
+            password: newUser.password,
             role: newUser.role,
             token: generateToken(newUser._id)
         })
@@ -60,12 +60,13 @@ export const getAllUsers = async(req,res)=>{
         const all = await user.find();
 
         if(all){
-            res.send(all);
+            res.status(200).json(all);
         }else{
-            res.send("No user found");
+            res.status(404).json({message:"No user found"});
         }
     }catch(error){
         console.error(error.message);
+        res.status(500).json(error.message)
     }
 }
 
@@ -117,7 +118,7 @@ export const updateUser = async(req,res)=>{
 //delete user
 export const deleteUser = async(req,res)=>{
     try{
-        if(!mysql.Types.ObjectId.isValid(req.params.id)){
+        if(!mongoose.Types.ObjectId.isValid(req.params.id)){
             return res.json({
                 message: "user not found"
             });
